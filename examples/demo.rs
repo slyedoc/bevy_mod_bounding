@@ -3,7 +3,7 @@ use bevy_mod_bounding::{aabb, debug, obb, *};
 
 fn main() {
     App::new()
-        .insert_resource(Msaa { samples: 2 })
+        //.insert_resource(Msaa { samples: 2 })
         .add_plugins(DefaultPlugins)
         .add_plugin(BoundingVolumePlugin::<sphere::BSphere>::default())
         .add_plugin(BoundingVolumePlugin::<aabb::Aabb>::default())
@@ -32,7 +32,11 @@ fn setup(
     commands
         .spawn_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube::default())),
-            material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
+            material: materials.add(StandardMaterial {
+                base_color:  Color::rgba(1.0, 1.0, 1.0, 0.5),
+                alpha_mode: AlphaMode::Blend,
+                ..Default::default()
+            }),
             transform: Transform::from_translation(Vec3::new(-1.0, 0.0, 0.0)),
             ..Default::default()
         })
@@ -43,7 +47,11 @@ fn setup(
     commands
         .spawn_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube::default())),
-            material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
+            material: materials.add(StandardMaterial {
+                base_color:  Color::rgba(1.0, 1.0, 1.0, 0.5),
+                alpha_mode: AlphaMode::Blend,
+                ..Default::default()
+            }),
             transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
             ..Default::default()
         })
@@ -54,7 +62,11 @@ fn setup(
     commands
         .spawn_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube::default())),
-            material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
+            material: materials.add(StandardMaterial {
+                base_color:  Color::rgba(1.0, 1.0, 1.0, 0.5),
+                alpha_mode: AlphaMode::Blend,
+                ..Default::default()
+            }),
             transform: Transform::from_translation(Vec3::new(1.0, 0.0, 0.0)),
             ..Default::default()
         })

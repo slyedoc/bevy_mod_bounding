@@ -1,7 +1,7 @@
 use crate::{aabb::Aabb, obb::Obb, sphere::BSphere, BoundingVolume};
 use bevy::{
     prelude::*,
-    render::{mesh::Indices, pipeline::PrimitiveTopology},
+    render::{mesh::Indices, render_resource::PrimitiveTopology, view::visibility::Visibility},
 };
 
 /// Marks an entity that should have a mesh added as a child to represent the mesh's bounding volume.
@@ -64,8 +64,8 @@ pub fn update_debug_meshes<T>(
 #[allow(clippy::type_complexity)]
 pub fn update_debug_mesh_visibility<T>(
     mut query: QuerySet<(
-        QueryState<(&Children, &Visible), (With<DebugBounds>, With<T>, Changed<Visible>)>,
-        QueryState<&mut Visible, With<DebugBoundsMesh>>,
+        QueryState<(&Children, &Visibility), (With<DebugBounds>, With<T>, Changed<Visibility>)>,
+        QueryState<&mut Visibility, With<DebugBoundsMesh>>,
     )>,
 ) where
     T: 'static + BoundingVolume + Clone + Send + Sync + Component,
@@ -95,11 +95,21 @@ impl From<&Aabb> for Mesh {
                  \ |     \ |
                   (5)-----(4)
         */
-        let vertices: Vec<[f32; 3]> = aabb
+        let positions: Vec<[f32; 3]> = aabb
             .vertices_mesh_space()
             .iter()
             .map(|vert| [vert.x, vert.y, vert.z])
             .collect();
+
+            
+            let mut normals = Vec::with_capacity(8);
+            let mut uvs = Vec::with_capacity(8);
+
+
+            for _ in  0..8 {
+                normals.push([0.0, 0.0, 1.0]);
+                uvs.push([0.0, 0.0]);
+            }
 
         let indices = Indices::U32(vec![
             0, 1, 1, 2, 2, 3, 3, 0, // Top ring
@@ -108,9 +118,9 @@ impl From<&Aabb> for Mesh {
         ]);
 
         let mut mesh = Mesh::new(PrimitiveTopology::LineList);
-        mesh.set_attribute(Mesh::ATTRIBUTE_POSITION, vertices.clone());
-        mesh.set_attribute(Mesh::ATTRIBUTE_UV_0, vertices.clone());
-        mesh.set_attribute(Mesh::ATTRIBUTE_NORMAL, vertices);
+        mesh.set_attribute(Mesh::ATTRIBUTE_POSITION, positions);
+        mesh.set_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
+        mesh.set_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
         mesh.set_indices(Some(indices));
         mesh
     }
@@ -127,11 +137,19 @@ impl From<&Obb> for Mesh {
                  \ |     \ |
                   (5)-----(4)
         */
-        let vertices: Vec<[f32; 3]> = obb
+        let positions: Vec<[f32; 3]> = obb
             .vertices_mesh_space()
             .iter()
             .map(|vert| [vert.x, vert.y, vert.z])
             .collect();
+
+        let mut normals = Vec::with_capacity(8);
+        let mut uvs = Vec::with_capacity(8);
+
+        for _ in  0..8 {
+            normals.push([0.0, 0.0, 1.0]);
+            uvs.push([0.0, 0.0]);
+        }
 
         let indices = Indices::U32(vec![
             0, 1, 1, 2, 2, 3, 3, 0, // Top ring
@@ -140,9 +158,9 @@ impl From<&Obb> for Mesh {
         ]);
 
         let mut mesh = Mesh::new(PrimitiveTopology::LineList);
-        mesh.set_attribute(Mesh::ATTRIBUTE_POSITION, vertices.clone());
-        mesh.set_attribute(Mesh::ATTRIBUTE_UV_0, vertices.clone());
-        mesh.set_attribute(Mesh::ATTRIBUTE_NORMAL, vertices);
+        mesh.set_attribute(Mesh::ATTRIBUTE_POSITION, positions);
+        mesh.set_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
+        mesh.set_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
         mesh.set_indices(Some(indices));
         mesh
     }
@@ -183,7 +201,17 @@ impl From<&BSphere> for Mesh {
                 ]
             })
             .collect();
-        let vertices = [vertices_x0, vertices_y0, vertices_z0].concat();
+        let positions = [vertices_x0, vertices_y0, vertices_z0].concat();
+
+        let mut normals = Vec::with_capacity(positions.len());
+        let mut uvs = Vec::with_capacity(positions.len());
+
+        for _ in  0..positions.len() {
+            normals.push([0.0, 0.0, 1.0]);
+            uvs.push([0.0, 0.0]);
+        }
+
+
         let indices_single: Vec<u32> = (0..n_points * 2)
             .map(|i| {
                 let result = (i as u32 + 1) / 2;
@@ -209,9 +237,9 @@ impl From<&BSphere> for Mesh {
             .concat(),
         );
         let mut mesh = Mesh::new(PrimitiveTopology::LineList);
-        mesh.set_attribute(Mesh::ATTRIBUTE_POSITION, vertices.clone());
-        mesh.set_attribute(Mesh::ATTRIBUTE_UV_0, vertices.clone());
-        mesh.set_attribute(Mesh::ATTRIBUTE_NORMAL, vertices);
+        mesh.set_attribute(Mesh::ATTRIBUTE_POSITION, positions);
+        mesh.set_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
+        mesh.set_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
         mesh.set_indices(Some(indices));
         mesh
     }

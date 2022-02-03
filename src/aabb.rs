@@ -1,7 +1,7 @@
 use crate::BoundingVolume;
 use bevy::{
     prelude::*,
-    render::{mesh::VertexAttributeValues, pipeline::PrimitiveTopology},
+    render::{mesh::VertexAttributeValues, render_resource::PrimitiveTopology},
 };
 use core::panic;
 
@@ -56,15 +56,16 @@ impl Aabb {
                  \ |     \ |
                   (5)-----(4)
         */
+
         [
-            Vec3::new(self.maximums.x, self.maximums.y, self.maximums.z),
-            Vec3::new(self.minimums.x, self.maximums.y, self.maximums.z),
-            Vec3::new(self.minimums.x, self.maximums.y, self.minimums.z),
-            Vec3::new(self.maximums.x, self.maximums.y, self.minimums.z),
-            Vec3::new(self.maximums.x, self.minimums.y, self.maximums.z),
-            Vec3::new(self.minimums.x, self.minimums.y, self.maximums.z),
-            Vec3::new(self.minimums.x, self.minimums.y, self.minimums.z),
-            Vec3::new(self.maximums.x, self.minimums.y, self.minimums.z),
+            Vec3::new(self.maximums.x, self.maximums.y, self.maximums.z), //0
+            Vec3::new(self.minimums.x, self.maximums.y, self.maximums.z), //1
+            Vec3::new(self.minimums.x, self.maximums.y, self.minimums.z), //2
+            Vec3::new(self.maximums.x, self.maximums.y, self.minimums.z), //3
+            Vec3::new(self.maximums.x, self.minimums.y, self.maximums.z), //4
+            Vec3::new(self.minimums.x, self.minimums.y, self.maximums.z), //5
+            Vec3::new(self.minimums.x, self.minimums.y, self.minimums.z), //6
+            Vec3::new(self.maximums.x, self.minimums.y, self.minimums.z), //7
         ]
     }
     pub fn from_extents(minimums: Vec3, maximums: Vec3) -> Self {

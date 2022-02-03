@@ -27,27 +27,24 @@ where
     Mesh: From<&'static T>,
 {
     fn build(&self, app: &mut App) {
-        app.add_system_to_stage(CoreStage::PreUpdate, spawn::<T>.system())
+        app.add_system_to_stage(CoreStage::PreUpdate, spawn::<T>)
             .add_system_to_stage(
                 CoreStage::PostUpdate,
                 update::<T>
-                    .system()
                     .after(TransformSystem::TransformPropagate)
                     .label(BoundingSystem::UpdateBounds),
             )
             .add_system_to_stage(
                 CoreStage::PostUpdate,
                 update_debug_meshes::<T>
-                    .system()
                     .after(BoundingSystem::UpdateBounds)
                     .label(BoundingSystem::UpdateDebug),
             )
             .add_system_to_stage(
                 CoreStage::PostUpdate,
                 update_debug_mesh_visibility::<T>
-                    .system()
                     .after(BoundingSystem::UpdateDebug)
-                    .before(bevy::render::RenderSystem::VisibleEntities),
+                    .before(bevy::render::view::visibility::VisibilitySystems::CheckVisibility),
             );
     }
 }
@@ -83,7 +80,7 @@ pub trait BoundingVolume {
     ) -> Option<Self>
     where
         Self: Sized;
-    /// Returns true iff the bounding mesh is entirely on the outside of the supplied plane.
+    /// Returns true if the bounding mesh is entirely on the outside of the supplied plane.
     /// "Outside" is the direction that the plane normal points to.
     fn outside_plane(
         &self,
